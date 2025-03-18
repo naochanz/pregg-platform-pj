@@ -7,8 +7,8 @@ import { Toaster } from "@/components/ui/toaster";
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: '士業コネクト - 若手士業専門家のマッチングプラットフォーム',
-  description: '弁護士、税理士、公認会計士、司法書士などの士業がプロフェッショナルとして相互相談・協業するためのプラットフォーム',
+  title: 'PREGG - 若手士業専門家のマッチングプラットフォーム',
+  description: '税理士、社労士、中小企業診断士などの士業がプロフェッショナルとして相互相談・協業するためのプラットフォーム',
 };
 
 export default function RootLayout({

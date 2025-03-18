@@ -40,7 +40,7 @@ export function Testimonials() {
             利用者の声
           </h2>
           <p className="text-gray-600">
-            士業コネクトを活用している専門家からの声をご紹介します
+            PREGGを活用している専門家からの声をご紹介します
           </p>
         </div>
 
