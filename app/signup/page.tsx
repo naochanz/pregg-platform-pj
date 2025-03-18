@@ -17,9 +17,9 @@ const professionTypes = [
 
 export default function SignupPage() {
     return (
-        <div className="container flex items-center justify-center min-h-screen px-4 py-12 mx-auto">
-            <div className="w-full max-w-md space-y-6">
-                <div className="space-y-2 text-center">
+        <div className="container flex flex-col items-center justify-between min-h-screen px-4 py-12 mx-auto">
+            <div className="w-full max-w-md">
+                <div className="space-y-2 text-center mb-6">
                     <h1 className="text-3xl font-bold">アカウント作成</h1>
                     <p className="text-muted-foreground">
                         PREGGで専門家とつながりましょう
@@ -32,8 +32,8 @@ export default function SignupPage() {
                         <TabsTrigger value="google">Google</TabsTrigger>
                     </TabsList>
 
-                    <TabsContent value="email" className="h-[440px]">
-                        <Card className="h-full">
+                    <TabsContent value="email">
+                        <Card className="border-2 border-gray-200 shadow-md bg-white rounded-lg">
                             <CardHeader>
                                 <CardTitle>メールアドレスで登録</CardTitle>
                                 <CardDescription>
@@ -68,7 +68,9 @@ export default function SignupPage() {
                                         </SelectContent>
                                     </Select>
                                 </div>
-                                <div className="flex items-center space-x-2">
+                            </CardContent>
+                            <CardFooter className="flex-col space-y-4">
+                                <div className="flex items-center space-x-2 w-full">
                                     <Checkbox id="terms" />
                                     <Label htmlFor="terms" className="text-sm">
                                         <span>
@@ -77,15 +79,13 @@ export default function SignupPage() {
                                         </span>
                                     </Label>
                                 </div>
-                            </CardContent>
-                            <CardFooter>
                                 <Button className="w-full">アカウント作成</Button>
                             </CardFooter>
                         </Card>
                     </TabsContent>
 
-                    <TabsContent value="google" className="h-[440px]">
-                        <Card className="h-full">
+                    <TabsContent value="google">
+                        <Card className="border-2 border-gray-200 shadow-md bg-white rounded-lg">
                             <CardHeader>
                                 <CardTitle>Googleで登録</CardTitle>
                                 <CardDescription>
@@ -136,7 +136,9 @@ export default function SignupPage() {
                                         </SelectContent>
                                     </Select>
                                 </div>
-                                <div className="flex items-center space-x-2">
+                            </CardContent>
+                            <CardFooter className="flex-col space-y-4">
+                                <div className="flex items-center space-x-2 w-full">
                                     <Checkbox id="terms-google" />
                                     <Label htmlFor="terms-google" className="text-sm">
                                         <span>
@@ -145,22 +147,20 @@ export default function SignupPage() {
                                         </span>
                                     </Label>
                                 </div>
-                            </CardContent>
-                            <CardFooter>
                                 <Button className="w-full" disabled>次へ</Button>
                             </CardFooter>
                         </Card>
                     </TabsContent>
                 </Tabs>
+            </div>
 
-                <div className="text-center">
-                    <p className="text-sm text-muted-foreground">
-                        すでにアカウントをお持ちですか？{" "}
-                        <Link href="/signin" className="underline">
-                            ログイン
-                        </Link>
-                    </p>
-                </div>
+            <div className="text-center mt-8 mb-4">
+                <p className="text-sm text-muted-foreground">
+                    すでにアカウントをお持ちですか？{" "}
+                    <Link href="/signin" className="underline">
+                        ログイン
+                    </Link>
+                </p>
             </div>
         </div>
     );
