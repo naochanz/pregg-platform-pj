@@ -38,11 +38,18 @@ import { Loader } from "lucide-react";
 import { signupSchema } from "@/lib/utils";
 
 const professionTypes = [
-  { id: "LAWYER", label: "弁護士" },
-  { id: "CPA", label: "会計士" },
-  { id: "TAX_ACCOUNTANT", label: "税理士" },
-  { id: "LABOR_CONSULTANT", label: "社会保険労務士" },
-  { id: "PATENT_ATTORNEY", label: "弁理士" },
+    { id: "LAWYER", label: "弁護士" },
+    { id: "TAX_ACCOUNTANT", label: "税理士" },
+    { id: "CPA", label: "公認会計士" },
+    { id: "JUDICIAL_SCRIVENER", label: "司法書士" },
+    { id: "ADMINISTRATIVE_SCRIVENER", label: "行政書士" },
+    { id: "LABOR_CONSULTANT", label: "社会保険労務士" },
+    { id: "PATENT_ATTORNEY", label: "弁理士" },
+    { id: "REAL_ESTATE_APPRAISER", label: "不動産鑑定士" },
+    { id: "LAND_SURVEYOR", label: "土地家屋調査士" },
+    { id: "SME_CONSULTANT", label: "中小企業診断士" },
+    { id: "OTHER", label: "その他" }
+
 ];
 
 export default function SignupPage() {
