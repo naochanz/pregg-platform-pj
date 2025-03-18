@@ -1,0 +1,47 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// ユーザーモデル
+model User {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  email     String   @unique
+  // emailVerified DateTime?
+  password  String
+  name      String
+  image     String? // プロフィール画像URL
+
+  // 士業情報
+  professionalType ProfessionalType // 士業タイプ（弁護士、税理士など）
+  // licenseVerified  Boolean          @default(false) // 資格認証済みかどうか
+  yearOfExperience Int? // 経験年数
+}
+
+// 士業タイプの列挙型
+enum ProfessionalType {
+  LAWYER // 弁護士
+  TAX_ACCOUNTANT // 税理士
+  CPA // 公認会計士
+  JUDICIAL_SCRIVENER // 司法書士
+  ADMINISTRATIVE_SCRIVENER // 行政書士
+  LABOR_CONSULTANT // 社会保険労務士
+  PATENT_ATTORNEY // 弁理士
+  REAL_ESTATE_APPRAISER // 不動産鑑定士
+  LAND_SURVEYOR // 土地家屋調査士
+  SME_CONSULTANT // 中小企業診断士
+  OTHER // その他
+}
