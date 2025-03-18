@@ -1,9 +1,8 @@
 export const dynamic = "force-static";
 import { NextRequest, NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
 import { signupSchema } from "@/lib/utils";
+import { connect, prisma } from "@/lib/prismaClient";
 
-const prisma = new PrismaClient();
 // import bcrypt from 'bcryptjs';
 
 export async function POST(request: NextRequest) {
@@ -27,6 +26,9 @@ export async function POST(request: NextRequest) {
 
     const { name, email, password, professionalType, yearOfExperience } =
       validationResult.data;
+
+    // データベースへの接続
+    await connect();
 
     // メールアドレスが既に使用されているか確認
     const existingUser = await prisma.user.findUnique({
@@ -70,5 +72,7 @@ export async function POST(request: NextRequest) {
       { error: "サーバーエラーが発生しました" },
       { status: 500 }
     );
+  } finally {
+    await prisma.$disconnect();
   }
 }

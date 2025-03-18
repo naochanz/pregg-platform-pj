@@ -74,12 +74,21 @@ export default function SignupPage() {
           title: data.error,
         });
       }
-    } catch (e) {
-      console.error(e);
-      toast({
-        variant: "destructive",
-        title: "エラーが発生しました",
-      });
+    } catch (e: unknown) {
+      if (e instanceof Error) {
+        console.error(e.message);
+        toast({
+          variant: "destructive",
+          title: "エラーが発生しました",
+          description: e.message,
+        });
+      } else {
+        console.error(e);
+        toast({
+          variant: "destructive",
+          title: "エラーが発生しました",
+        });
+      }
     } finally {
       setIsloding(false);
     }
