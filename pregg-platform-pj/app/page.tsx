@@ -140,8 +140,8 @@ export default function Home() {
               <h3 className="text-white font-semibold mb-4">会社情報</h3>
               <ul className="space-y-2 text-sm">
                 <li>会社概要</li>
-                <li>利用規約</li>
-                <li>プライバシーポリシー</li>
+                <li><Link href="/terms" className="underline hover:text-primary">利用規約</Link></li>
+                <li><Link href="/privacy" className="underline hover:text-primary">プライバシーポリシー</Link></li>
                 <li>お問い合わせ</li>
               </ul>
             </div>

@@ -37,6 +37,7 @@ import { toast } from "@/hooks/use-toast";
 import { Loader } from "lucide-react";
 import { signupSchema } from "@/lib/utils";
 
+
 const professionTypes = [
     { id: "LAWYER", label: "弁護士" },
     { id: "TAX_ACCOUNTANT", label: "税理士" },
@@ -211,20 +212,35 @@ export default function SignupPage() {
                   </CardContent>
                   <CardFooter className="flex-col space-y-4">
                     <div className="flex items-center space-x-2 w-full">
-                      <Checkbox id="terms" />
-                      <Label htmlFor="terms" className="text-sm">
-                        <span>
-                          <Link href="/terms" className="underline">
-                            利用規約
-                          </Link>
-                          と
-                          <Link href="/privacy" className="underline">
-                            プライバシーポリシー
-                          </Link>
-                          に同意します
-                        </span>
-                      </Label>
-                    </div>
+                    <FormField
+  control={form.control}
+  name="termsAgreed"
+  render={({ field }) => (
+    <FormItem className="flex flex-row items-start space-x-2 space-y-0">
+      <FormControl>
+        <Checkbox
+          id="terms"
+          checked={field.value}
+          onCheckedChange={field.onChange}
+        />
+      </FormControl>
+      <div className="space-y-1 leading-none">
+        <FormLabel htmlFor="terms" className="text-sm">
+          <span>
+            <Link href="/terms" className="underline">
+              利用規約
+            </Link>
+            と
+            <Link href="/privacy" className="underline">
+              プライバシーポリシー
+            </Link>
+            に同意します
+          </span>
+        </FormLabel>
+        <FormMessage />
+      </div>
+    </FormItem>)}/>
+    </div>
                     <Button
                       type="submit"
                       className="w-full"

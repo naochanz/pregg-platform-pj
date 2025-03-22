@@ -17,4 +17,7 @@ export const signupSchema = z.object({
     errorMap: () => ({ message: "有効な士業タイプを選択してください" }),
   }),
   yearOfExperience: z.number().optional(),
+  termsAgreed: z.boolean().refine((data) => data, {
+    message: "利用規約とプライバシーポリシーに同意してください",
+  }),
 });
