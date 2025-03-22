@@ -1,5 +1,6 @@
+// app/dashboard/account/page.tsx
 "use client";
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -37,27 +38,15 @@ import {
   TabsTrigger,
 } from "@/components/ui/tabs";
 import { toast } from "@/hooks/use-toast";
-
-// プロフィール情報のバリデーションスキーマ
-const accountFormSchema = z.object({
-  name: z.string().min(1, "名前は必須です"),
-  email: z.string().email("有効なメールアドレスを入力してください"),
-  phoneNumber: z.string().optional(),
-  postalCode: z.string().optional(),
-  prefecture: z.string().optional(),
-  city: z.string().optional(),
-  addressLine1: z.string().optional(),
-  addressLine2: z.string().optional(),
-  bio: z.string().max(500, "自己紹介は500文字以内で入力してください").optional(),
-  website: z.string().url("有効なURLを入力してください").optional().or(z.literal("")),
-  company: z.string().optional(),
-  position: z.string().optional(),
-});
+import { Loader } from "lucide-react";
+import { accountFormSchema } from "@/lib/utils";
 
 type AccountFormValues = z.infer<typeof accountFormSchema>;
 
 export default function AccountPage() {
-  // ダミーのデフォルト値
+  const [isLoading, setIsLoading] = useState(false);
+  
+  // フォームの初期値
   const defaultValues: Partial<AccountFormValues> = {
     name: "山田 太郎",
     email: "yamada@example.com",
@@ -77,12 +66,66 @@ export default function AccountPage() {
     resolver: zodResolver(accountFormSchema),
     defaultValues,
   });
+  
+  // アカウント情報をAPIから取得
+  useEffect(() => {
+    const fetchAccountData = async () => {
+      try {
+        const response = await fetch('/api/account');
+        if (response.ok) {
+          const accountData = await response.json();
+          if (accountData && Object.keys(accountData).length > 0) {
+            // APIから取得したデータでフォームを更新
+            // ユーザー情報も含めて完全な実装にする際は、別のAPI呼び出しや統合が必要
+            form.reset({
+              ...defaultValues,
+              ...accountData
+            });
+          }
+        }
+      } catch (error) {
+        console.error('アカウント情報の取得に失敗しました:', error);
+        toast({
+          variant: "destructive",
+          title: "エラーが発生しました",
+          description: "アカウント情報の読み込みに失敗しました。",
+        });
+      }
+    };
+    
+    fetchAccountData();
+  }, [form]);
 
-  function onSubmit(data: AccountFormValues) {
-    toast({
-      title: "プロフィール情報を更新しました",
-    });
-    console.log(data);
+  async function onSubmit(data: AccountFormValues) {
+    setIsLoading(true);
+    try {
+      // APIにデータを送信
+      const response = await fetch('/api/account', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || '保存に失敗しました');
+      }
+      
+      toast({
+        title: "プロフィール情報を更新しました",
+      });
+    } catch (error) {
+      console.error('保存エラー:', error);
+      toast({
+        variant: "destructive",
+        title: "エラーが発生しました",
+        description: error instanceof Error ? error.message : "プロフィール情報の保存に失敗しました。",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   return (
@@ -307,7 +350,16 @@ export default function AccountPage() {
                 </CardContent>
 
                 <CardFooter>
-                  <Button type="submit">保存する</Button>
+                  <Button type="submit" disabled={isLoading}>
+                    {isLoading ? (
+                      <div className="flex items-center">
+                        <Loader className="mr-2 h-4 w-4 animate-spin" />
+                        保存中...
+                      </div>
+                    ) : (
+                      "保存する"
+                    )}
+                  </Button>
                 </CardFooter>
               </form>
             </Form>
