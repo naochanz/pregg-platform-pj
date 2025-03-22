@@ -36,6 +36,7 @@ import { useForm } from "react-hook-form";
 import { toast } from "@/hooks/use-toast";
 import { Loader } from "lucide-react";
 import { signupSchema } from "@/lib/utils";
+import { useRouter } from "next/navigation";
 
 
 const professionTypes = [
@@ -59,48 +60,53 @@ export default function SignupPage() {
     resolver: zodResolver(signupSchema),
   });
 
-  async function onSubmit(values: z.infer<typeof signupSchema>) {
-    setIsloding(true);
-    try {
-      const response = await fetch("api/auth/signup", {
-        headers: {
-          "Content-Type": "application/json",
-        },
-        method: "POST",
-        body: JSON.stringify(values),
+ // signup.tsx の onSubmit 関数を修正
+async function onSubmit(values: z.infer<typeof signupSchema>) {
+  setIsloding(true);
+  try {
+    const response = await fetch("/api/auth/signup", {
+      headers: {
+        "Content-Type": "application/json",
+      },
+      method: "POST",
+      body: JSON.stringify(values),
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      toast({
+        title: "アカウントを作成しました",
       });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        toast({
-          title: "アカウントを作成しました",
-        });
-      } else {
-        toast({
-          variant: "destructive",
-          title: data.error,
-        });
-      }
-    } catch (e: unknown) {
-      if (e instanceof Error) {
-        console.error(e.message);
-        toast({
-          variant: "destructive",
-          title: "エラーが発生しました",
-          description: e.message,
-        });
-      } else {
-        console.error(e);
-        toast({
-          variant: "destructive",
-          title: "エラーが発生しました",
-        });
-      }
-    } finally {
-      setIsloding(false);
+      // アカウント作成成功後にダッシュボードページへリダイレクト
+      router.push("/dashboard");
+    } else {
+      toast({
+        variant: "destructive",
+        title: data.error,
+      });
     }
+  } catch (e: unknown) {
+    if (e instanceof Error) {
+      console.error(e.message);
+      toast({
+        variant: "destructive",
+        title: "エラーが発生しました",
+        description: e.message,
+      });
+    } else {
+      console.error(e);
+      toast({
+        variant: "destructive",
+        title: "エラーが発生しました",
+      });
+    }
+  } finally {
+    setIsloding(false);
   }
+}
+
+const router = useRouter();
 
   return (
     <div className="container flex flex-col items-center justify-between min-h-screen px-4 py-12 mx-auto">
