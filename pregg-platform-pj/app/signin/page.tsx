@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { signIn } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -23,30 +24,33 @@ export default function SignInPage() {
         setIsLoading(true);
 
         try {
-            // 実際のアプリケーションではここで認証APIを呼び出します
-            // 例: const response = await fetch("/api/auth/signin", { ... });
-            
-            // ダミーの遅延を追加（実際の実装では削除）
-            await new Promise(resolve => setTimeout(resolve, 1000));
-            
-            // 認証成功と仮定
+            const result = await signIn("credentials", {
+              email,
+              password,
+              redirect: false,
+            });
+      
+            if (result?.error) {
+              throw new Error(result.error);
+            }
+      
             toast({
-                title: "ログインしました",
+              title: "ログインしました",
             });
             
-            // ダッシュボードにリダイレクト
             router.push("/dashboard");
-        } catch (error) {
+            router.refresh();
+          } catch (error) {
             console.error("ログインエラー:", error);
             toast({
-                variant: "destructive",
-                title: "ログインに失敗しました",
-                description: "メールアドレスまたはパスワードが正しくありません",
+              variant: "destructive",
+              title: "ログインに失敗しました",
+              description: "メールアドレスまたはパスワードが正しくありません",
             });
-        } finally {
+          } finally {
             setIsLoading(false);
-        }
-    };
+          }
+        };
 
     const handleGoogleLogin = () => {
         setIsLoading(true);

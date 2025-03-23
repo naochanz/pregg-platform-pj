@@ -1,7 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Building2, Users, BadgeCheck, ArrowRight, MessageSquare, Search, Shield } from "lucide-react";
-import Image from "next/image";
+import { Building2, ArrowRight, MessageSquare, Search, Shield } from "lucide-react";
 import { Testimonials } from "@/components/testimonials";
 import Link from "next/link";
 
@@ -16,7 +15,9 @@ export default function Home() {
             <span className="ml-2 text-xl font-bold text-gray-900">PREGG</span>
           </div>
           <div className="flex items-center gap-4">
-            <Button variant="ghost">ログイン</Button>
+            <Link href="/signin">
+              <Button variant="ghost">ログイン</Button>
+            </Link>
             <Link href="/signup">
               <Button variant="default">無料登録</Button>
             </Link>

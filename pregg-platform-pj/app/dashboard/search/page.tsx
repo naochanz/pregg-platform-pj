@@ -36,6 +36,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { Badge } from "@/components/ui/badge";
+import Link from "next/link";
 
 export default function SearchPage() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -111,7 +112,7 @@ export default function SearchPage() {
               value={professionalType}
               onValueChange={setProfessionalType}
             >
-              <SelectTrigger>
+              <SelectTrigger className="flex-1">
                 <SelectValue placeholder="士業タイプ" />
               </SelectTrigger>
               <SelectContent>
@@ -230,7 +231,9 @@ export default function SearchPage() {
                   <p className="text-sm font-medium">相談料金</p>
                   <p className="text-sm">{expert.hourlyRate}円/時間〜</p>
                 </div>
-                <Button size="sm">詳細を見る</Button>
+                <Button size="sm" asChild>
+                  <Link href={`/dashboard/expert/${expert.id}`}>詳細を見る</Link>
+                </Button>
               </div>
             </CardContent>
           </Card>

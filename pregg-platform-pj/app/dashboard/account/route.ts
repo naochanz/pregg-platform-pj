@@ -2,12 +2,18 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prismaClient';
 import { accountApiSchema } from '@/lib/utils';
+import { auth } from "@/lib/auth"; 
 
 export async function POST(req: NextRequest) {
   try {
-    // 現時点では認証機能が完全ではないため、ダミーのユーザーIDを使用
-    // 実際の実装では、getServerSessionを使用して認証済みユーザーのIDを取得
-    const dummyUserId = "user-id-123"; // 仮のID
+    // セッションからユーザー情報を取得
+    const session = await auth();
+    if (!session || !session.user || !session.user.id) {
+      return NextResponse.json({ error: '認証が必要です' }, { status: 401 });
+    }
+    
+    // 認証済みユーザーのID
+    const userId = session.user.id;
     
     // リクエストボディを取得
     const data = await req.json();
@@ -25,10 +31,10 @@ export async function POST(req: NextRequest) {
     
     // プロフィール情報をアップサート（更新または作成）
     const account = await prisma.account.upsert({
-      where: { userId: dummyUserId },
+      where: { userId },
       update: validatedData,
       create: {
-        userId: dummyUserId,
+        userId,
         ...validatedData
       },
     });
@@ -48,19 +54,18 @@ export async function POST(req: NextRequest) {
 
 export async function GET(req: NextRequest) {
   try {
-    // 認証チェック（実際の実装ではこちらを使用）
-    // const session = await getServerSession(authOptions);
-    // if (!session || !session.user) {
-    //   return NextResponse.json({ error: '認証が必要です' }, { status: 401 });
-    // }
-    // const userId = session.user.id;
+    // セッションからユーザー情報を取得
+    const session = await auth();
+    if (!session || !session.user || !session.user.id) {
+      return NextResponse.json({ error: '認証が必要です' }, { status: 401 });
+    }
     
-    // ダミーのユーザーID（実際の実装では削除）
-    const dummyUserId = "user-id-123";
+    // 認証済みユーザーのID
+    const userId = session.user.id;
     
     // ユーザーのアカウント情報を取得
     const account = await prisma.account.findUnique({
-      where: { userId: dummyUserId },
+      where: { userId },
     });
     
     if (!account) {

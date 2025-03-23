@@ -57,7 +57,13 @@ const professionTypes = [
 export default function SignupPage() {
   const [isLoading, setIsloding] = useState(false);
   const form = useForm<z.infer<typeof signupSchema>>({
-    resolver: zodResolver(signupSchema),
+    defaultValues: {
+      name: "",
+      email: "",
+      password: "",
+      professionalType: "OTHER",
+      termsAgreed: false,
+    },
   });
 
  // signup.tsx の onSubmit 関数を修正
@@ -195,8 +201,9 @@ const router = useRouter();
                             <FormLabel htmlFor="password">士業タイプ</FormLabel>
                             <FormControl>
                               <Select
-                                onValueChange={field.onChange}
-                                value={field.value}
+                                  onValueChange={field.onChange}
+                                  value={field.value || ""}
+                                  defaultValue={field.value || ""}
                               >
                                 <SelectTrigger>
                                   <SelectValue placeholder="選択してください" />
