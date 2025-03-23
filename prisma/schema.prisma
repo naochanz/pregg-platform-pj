@@ -14,24 +14,49 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
-// ユーザーモデル
-model User {
-  id        String   @id @default(cuid())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  email     String   @unique
-  // emailVerified DateTime?
-  password  String
-  name      String
-  image     String? // プロフィール画像URL
+// prisma/schema.prisma
 
-  // 士業情報
-  professionalType ProfessionalType // 士業タイプ（弁護士、税理士など）
-  // licenseVerified  Boolean          @default(false) // 資格認証済みかどうか
-  yearOfExperience Int? // 経験年数
+// 既存のモデル
+model User {
+  id               String   @id @default(uuid())
+  name             String
+  email            String   @unique
+  password         String
+  professionalType ProfessionalType
+  yearOfExperience Int?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  
+
+  // Accountテーブルとのリレーション
+  account          Account?
 }
 
-// 士業タイプの列挙型
+// 新しく追加するAccountモデル
+model Account {
+  id           String  @id @default(uuid())
+  phoneNumber  String?
+  postalCode   String?
+  prefecture   String?
+  city         String?
+  addressLine1 String?
+  addressLine2 String?
+  bio          String? @db.Text
+  website      String?
+  company      String?
+  position     String?
+  
+  // Userテーブルとのリレーション
+  userId       String  @unique
+  user         User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([userId])
+}
+
+// 既存のProfessionalType enum
 enum ProfessionalType {
   LAWYER // 弁護士
   TAX_ACCOUNTANT // 税理士

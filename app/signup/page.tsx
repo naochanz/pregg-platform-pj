@@ -36,6 +36,8 @@ import { useForm } from "react-hook-form";
 import { toast } from "@/hooks/use-toast";
 import { Loader } from "lucide-react";
 import { signupSchema } from "@/lib/utils";
+import { useRouter } from "next/navigation";
+
 
 const professionTypes = [
     { id: "LAWYER", label: "弁護士" },
@@ -55,51 +57,62 @@ const professionTypes = [
 export default function SignupPage() {
   const [isLoading, setIsloding] = useState(false);
   const form = useForm<z.infer<typeof signupSchema>>({
-    resolver: zodResolver(signupSchema),
+    defaultValues: {
+      name: "",
+      email: "",
+      password: "",
+      professionalType: "OTHER",
+      termsAgreed: false,
+    },
   });
 
-  async function onSubmit(values: z.infer<typeof signupSchema>) {
-    setIsloding(true);
-    try {
-      const response = await fetch("api/auth/signup", {
-        headers: {
-          "Content-Type": "application/json",
-        },
-        method: "POST",
-        body: JSON.stringify(values),
+ // signup.tsx の onSubmit 関数を修正
+async function onSubmit(values: z.infer<typeof signupSchema>) {
+  setIsloding(true);
+  try {
+    const response = await fetch("/api/auth/signup", {
+      headers: {
+        "Content-Type": "application/json",
+      },
+      method: "POST",
+      body: JSON.stringify(values),
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      toast({
+        title: "アカウントを作成しました",
       });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        toast({
-          title: "アカウントを作成しました",
-        });
-      } else {
-        toast({
-          variant: "destructive",
-          title: data.error,
-        });
-      }
-    } catch (e: unknown) {
-      if (e instanceof Error) {
-        console.error(e.message);
-        toast({
-          variant: "destructive",
-          title: "エラーが発生しました",
-          description: e.message,
-        });
-      } else {
-        console.error(e);
-        toast({
-          variant: "destructive",
-          title: "エラーが発生しました",
-        });
-      }
-    } finally {
-      setIsloding(false);
+      // アカウント作成成功後にダッシュボードページへリダイレクト
+      router.push("/dashboard");
+    } else {
+      toast({
+        variant: "destructive",
+        title: data.error,
+      });
     }
+  } catch (e: unknown) {
+    if (e instanceof Error) {
+      console.error(e.message);
+      toast({
+        variant: "destructive",
+        title: "エラーが発生しました",
+        description: e.message,
+      });
+    } else {
+      console.error(e);
+      toast({
+        variant: "destructive",
+        title: "エラーが発生しました",
+      });
+    }
+  } finally {
+    setIsloding(false);
   }
+}
+
+const router = useRouter();
 
   return (
     <div className="container flex flex-col items-center justify-between min-h-screen px-4 py-12 mx-auto">
@@ -188,8 +201,9 @@ export default function SignupPage() {
                             <FormLabel htmlFor="password">士業タイプ</FormLabel>
                             <FormControl>
                               <Select
-                                onValueChange={field.onChange}
-                                value={field.value}
+                                  onValueChange={field.onChange}
+                                  value={field.value || ""}
+                                  defaultValue={field.value || ""}
                               >
                                 <SelectTrigger>
                                   <SelectValue placeholder="選択してください" />
@@ -211,20 +225,35 @@ export default function SignupPage() {
                   </CardContent>
                   <CardFooter className="flex-col space-y-4">
                     <div className="flex items-center space-x-2 w-full">
-                      <Checkbox id="terms" />
-                      <Label htmlFor="terms" className="text-sm">
-                        <span>
-                          <Link href="/terms" className="underline">
-                            利用規約
-                          </Link>
-                          と
-                          <Link href="/privacy" className="underline">
-                            プライバシーポリシー
-                          </Link>
-                          に同意します
-                        </span>
-                      </Label>
-                    </div>
+                    <FormField
+  control={form.control}
+  name="termsAgreed"
+  render={({ field }) => (
+    <FormItem className="flex flex-row items-start space-x-2 space-y-0">
+      <FormControl>
+        <Checkbox
+          id="terms"
+          checked={field.value}
+          onCheckedChange={field.onChange}
+        />
+      </FormControl>
+      <div className="space-y-1 leading-none">
+        <FormLabel htmlFor="terms" className="text-sm">
+          <span>
+            <Link href="/terms" className="underline">
+              利用規約
+            </Link>
+            と
+            <Link href="/privacy" className="underline">
+              プライバシーポリシー
+            </Link>
+            に同意します
+          </span>
+        </FormLabel>
+        <FormMessage />
+      </div>
+    </FormItem>)}/>
+    </div>
                     <Button
                       type="submit"
                       className="w-full"
