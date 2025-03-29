@@ -1,10 +1,18 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Building2, ArrowRight, MessageSquare, Search, Shield } from "lucide-react";
+import {
+  Building2,
+  ArrowRight,
+  MessageSquare,
+  Search,
+  Shield,
+} from "lucide-react";
 import { Testimonials } from "@/components/testimonials";
 import Link from "next/link";
 
 export default function Home() {
+  
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-gray-50">
       {/* Header/Navigation */}
@@ -31,11 +39,13 @@ export default function Home() {
           <div className="text-center">
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 mb-6">
               専門家同士の<span className="text-gray-800">協業</span>を、
-              <br />もっとスマートに。
+              <br />
+              もっとスマートに。
             </h1>
             <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
               PREGGは、税理士、社労士、中小企業診断士など、
-              <br />若手専門家のための相互相談・協業プラットフォームです。
+              <br />
+              若手専門家のための相互相談・協業プラットフォームです。
             </p>
             <div className="flex justify-center gap-4">
               <Link href="/signup">
@@ -123,8 +133,10 @@ export default function Home() {
                 <span className="ml-2 text-xl font-bold text-white">PREGG</span>
               </div>
               <p className="mt-4 text-sm">
-                専門家同士の協業を促進し、<br />
-                より良いサービスを提供するための<br />
+                専門家同士の協業を促進し、
+                <br />
+                より良いサービスを提供するための
+                <br />
                 プラットフォーム
               </p>
             </div>
@@ -141,8 +153,19 @@ export default function Home() {
               <h3 className="text-white font-semibold mb-4">会社情報</h3>
               <ul className="space-y-2 text-sm">
                 <li>会社概要</li>
-                <li><Link href="/terms" className="underline hover:text-primary">利用規約</Link></li>
-                <li><Link href="/privacy" className="underline hover:text-primary">プライバシーポリシー</Link></li>
+                <li>
+                  <Link href="/terms" className="underline hover:text-primary">
+                    利用規約
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/privacy"
+                    className="underline hover:text-primary"
+                  >
+                    プライバシーポリシー
+                  </Link>
+                </li>
                 <li>お問い合わせ</li>
               </ul>
             </div>

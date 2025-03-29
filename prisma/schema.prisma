@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -14,59 +8,48 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
-// prisma/schema.prisma
-
-// 既存のモデル
 model User {
-  id               String   @id @default(uuid())
+  id               String           @id @default(uuid())
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+  email            String           @unique
   name             String
-  email            String   @unique
-  password         String
   professionalType ProfessionalType
   yearOfExperience Int?
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
-  
-
-  // Accountテーブルとのリレーション
+  password         String
   account          Account?
 }
 
-// 新しく追加するAccountモデル
 model Account {
-  id           String  @id @default(uuid())
+  id           String   @id @default(uuid())
   phoneNumber  String?
   postalCode   String?
   prefecture   String?
   city         String?
   addressLine1 String?
   addressLine2 String?
-  bio          String? @db.Text
+  bio          String?
   website      String?
   company      String?
   position     String?
-  
-  // Userテーブルとのリレーション
-  userId       String  @unique
-  user         User    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
+  userId       String   @unique
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
 }
 
-// 既存のProfessionalType enum
 enum ProfessionalType {
-  LAWYER // 弁護士
-  TAX_ACCOUNTANT // 税理士
-  CPA // 公認会計士
-  JUDICIAL_SCRIVENER // 司法書士
-  ADMINISTRATIVE_SCRIVENER // 行政書士
-  LABOR_CONSULTANT // 社会保険労務士
-  PATENT_ATTORNEY // 弁理士
-  REAL_ESTATE_APPRAISER // 不動産鑑定士
-  LAND_SURVEYOR // 土地家屋調査士
-  SME_CONSULTANT // 中小企業診断士
-  OTHER // その他
+  LAWYER
+  TAX_ACCOUNTANT
+  CPA
+  JUDICIAL_SCRIVENER
+  ADMINISTRATIVE_SCRIVENER
+  LABOR_CONSULTANT
+  PATENT_ATTORNEY
+  REAL_ESTATE_APPRAISER
+  LAND_SURVEYOR
+  SME_CONSULTANT
+  OTHER
 }

@@ -1,38 +1,38 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prismaClient";
-import { hash } from "bcrypt";
+import * as bcrypt from "bcrypt";
 import { signupSchema } from "@/lib/utils";
 
 export async function POST(req: NextRequest) {
   try {
     const data = await req.json();
-    
+
     // バリデーション
     const validationResult = signupSchema.safeParse(data);
     if (!validationResult.success) {
       return NextResponse.json(
-        { error: '入力データが無効です' }, 
+        { error: "入力データが無効です" },
         { status: 400 }
       );
     }
-    
+
     const { name, email, password, professionalType } = validationResult.data;
-    
+
     // 既存ユーザーの確認
     const existingUser = await prisma.user.findUnique({
-      where: { email }
+      where: { email },
     });
-    
+
     if (existingUser) {
       return NextResponse.json(
-        { error: 'このメールアドレスは既に登録されています' },
+        { error: "このメールアドレスは既に登録されています" },
         { status: 409 }
       );
     }
-    
+
     // パスワードハッシュ化
-    const hashedPassword = await hash(password, 10);
-    
+    const hashedPassword = await bcrypt.hash(password as string, 10);
+
     // ユーザー作成
     const user = await prisma.user.create({
       data: {
@@ -40,19 +40,26 @@ export async function POST(req: NextRequest) {
         email,
         password: hashedPassword,
         professionalType,
-      }
+      },
     });
-    
+
+    const account = await prisma.account.create({
+      data: {
+        userId: user.id,
+      },
+    });
+
     // ユーザーIDを含めてレスポンス
     return NextResponse.json({
       id: user.id,
       name: user.name,
       email: user.email,
+      account: account.id,
     });
   } catch (error) {
-    console.error('ユーザー登録エラー:', error);
+    console.error("ユーザー登録エラー:", error);
     return NextResponse.json(
-      { error: 'ユーザー登録に失敗しました' },
+      { error: "ユーザー登録に失敗しました" },
       { status: 500 }
     );
   }

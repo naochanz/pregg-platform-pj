@@ -1,7 +1,7 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   Home,
   User,
@@ -14,12 +14,14 @@ import {
   ChevronRight,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import {
-  Sheet,
-  SheetContent,
-  SheetTrigger,
-} from "@/components/ui/sheet";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { signOut, useSession } from "next-auth/react";
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -28,6 +30,10 @@ interface DashboardLayoutProps {
 export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const pathname = usePathname();
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const { data: session, status } = useSession();
+  console.log("session: ", session);
+  console.log("email: ", session?.user.email);
+  const router = useRouter();
 
   const sidebarItems = [
     {
@@ -69,19 +75,26 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
       </div>
 
       {/* デスクトップ用サイドバー */}
-      <div className={`hidden lg:flex flex-col ${sidebarCollapsed ? 'w-16' : 'w-64'} bg-white border-r border-gray-200 transition-all duration-300`}>
+      <div
+        className={`hidden lg:flex flex-col ${
+          sidebarCollapsed ? "w-16" : "w-64"
+        } bg-white border-r border-gray-200 transition-all duration-300`}
+      >
         <div className="flex items-center justify-between h-16 border-b border-gray-200 px-4">
-          {!sidebarCollapsed && <h1 className="text-2xl font-bold text-primary">PREGG</h1>}
-          <Button 
-            variant="ghost" 
-            size="icon" 
+          {!sidebarCollapsed && (
+            <h1 className="text-2xl font-bold text-primary">PREGG</h1>
+          )}
+          <Button
+            variant="ghost"
+            size="icon"
             onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
             className={sidebarCollapsed ? "mx-auto" : ""}
           >
-            {sidebarCollapsed ? 
-              <ChevronRight className="h-5 w-5" /> : 
+            {sidebarCollapsed ? (
+              <ChevronRight className="h-5 w-5" />
+            ) : (
               <ChevronLeft className="h-5 w-5" />
-            }
+            )}
           </Button>
         </div>
         <nav className="flex-1 overflow-y-auto py-4">
@@ -103,9 +116,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                           {item.icon}
                         </Link>
                       </TooltipTrigger>
-                      <TooltipContent side="right">
-                        {item.title}
-                      </TooltipContent>
+                      <TooltipContent side="right">{item.title}</TooltipContent>
                     </Tooltip>
                   ) : (
                     <Link
@@ -130,22 +141,30 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
             {sidebarCollapsed ? (
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Button variant="outline" size="icon" asChild className="w-full">
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    asChild
+                    className="w-full"
+                  >
                     <Link href="/signin">
                       <LogOut className="h-5 w-5" />
                     </Link>
                   </Button>
                 </TooltipTrigger>
-                <TooltipContent side="right">
-                  ログアウト
-                </TooltipContent>
+                <TooltipContent side="right">ログアウト</TooltipContent>
               </Tooltip>
             ) : (
-              <Button variant="outline" className="w-full justify-start" asChild>
-                <Link href="/signin">
+              <Button
+                variant="outline"
+                className="w-full justify-start"
+                onClick={() => signOut()}
+              >
+                ログアウト
+                {/* <Link href="/signin">
                   <LogOut className="h-5 w-5 mr-2" />
                   ログアウト
-                </Link>
+                </Link> */}
               </Button>
             )}
           </TooltipProvider>
@@ -153,11 +172,15 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
       </div>
 
       {/* メインコンテンツエリア */}
-      <div className={`flex-1 flex flex-col transition-all duration-300 ${sidebarCollapsed ? 'lg:ml-16' : 'lg:ml-64'}`}>
+      <div
+        className={`flex-1 flex flex-col transition-all duration-300 ${
+          sidebarCollapsed ? "lg:ml-16" : "lg:ml-64"
+        }`}
+      >
         {/* ヘッダー */}
         <header className="flex items-center justify-between h-16 px-4 sm:px-6 bg-white border-b border-gray-200">
           <h1 className="text-xl font-semibold text-gray-900">
-            ようこそ、山田太郎さん
+            ようこそ、{session?.user.name || "山田太郎"} さん
           </h1>
           <div className="flex items-center space-x-2">
             <Button variant="ghost" size="icon">
@@ -178,7 +201,13 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   );
 }
 
-function MobileSidebar({ items, pathname }: { items: any[]; pathname: string }) {
+function MobileSidebar({
+  items,
+  pathname,
+}: {
+  items: any[];
+  pathname: string;
+}) {
   return (
     <div className="flex flex-col h-full bg-white">
       <div className="flex items-center justify-center h-16 border-b border-gray-200">

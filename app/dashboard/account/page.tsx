@@ -31,21 +31,17 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@/components/ui/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "@/hooks/use-toast";
 import { Loader } from "lucide-react";
 import { accountFormSchema } from "@/lib/utils";
+import { useSession } from "next-auth/react";
 
 type AccountFormValues = z.infer<typeof accountFormSchema>;
 
 export default function AccountPage() {
   const [isLoading, setIsLoading] = useState(false);
-  
+
   // フォームの初期値
   const defaultValues: Partial<AccountFormValues> = {
     name: "山田 太郎",
@@ -66,12 +62,18 @@ export default function AccountPage() {
     resolver: zodResolver(accountFormSchema),
     defaultValues,
   });
-  
+  const { data: session, status } = useSession();
+
+  useEffect(() => {
+    console.log(session);
+    console.log(status);
+  }, [session, status]);
+
   // アカウント情報をAPIから取得
   useEffect(() => {
     const fetchAccountData = async () => {
       try {
-        const response = await fetch('/api/account');
+        const response = await fetch("/api/account");
         if (response.ok) {
           const accountData = await response.json();
           if (accountData && Object.keys(accountData).length > 0) {
@@ -79,12 +81,12 @@ export default function AccountPage() {
             // ユーザー情報も含めて完全な実装にする際は、別のAPI呼び出しや統合が必要
             form.reset({
               ...defaultValues,
-              ...accountData
+              ...accountData,
             });
           }
         }
       } catch (error) {
-        console.error('アカウント情報の取得に失敗しました:', error);
+        console.error("アカウント情報の取得に失敗しました:", error);
         toast({
           variant: "destructive",
           title: "エラーが発生しました",
@@ -92,7 +94,7 @@ export default function AccountPage() {
         });
       }
     };
-    
+
     fetchAccountData();
   }, [form]);
 
@@ -100,28 +102,31 @@ export default function AccountPage() {
     setIsLoading(true);
     try {
       // APIにデータを送信
-      const response = await fetch('/api/account', {
-        method: 'POST',
+      const response = await fetch("/api/account", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(data),
       });
-      
+
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || '保存に失敗しました');
+        throw new Error(errorData.error || "保存に失敗しました");
       }
-      
+
       toast({
         title: "プロフィール情報を更新しました",
       });
     } catch (error) {
-      console.error('保存エラー:', error);
+      console.error("保存エラー:", error);
       toast({
         variant: "destructive",
         title: "エラーが発生しました",
-        description: error instanceof Error ? error.message : "プロフィール情報の保存に失敗しました。",
+        description:
+          error instanceof Error
+            ? error.message
+            : "プロフィール情報の保存に失敗しました。",
       });
     } finally {
       setIsLoading(false);
@@ -148,7 +153,10 @@ export default function AccountPage() {
               </CardDescription>
             </CardHeader>
             <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+              <form
+                onSubmit={form.handleSubmit(onSubmit)}
+                className="space-y-8"
+              >
                 <CardContent className="space-y-6">
                   <div className="grid gap-4 sm:grid-cols-2">
                     <FormField
@@ -171,7 +179,10 @@ export default function AccountPage() {
                         <FormItem>
                           <FormLabel>メールアドレス</FormLabel>
                           <FormControl>
-                            <Input placeholder="example@example.com" {...field} />
+                            <Input
+                              placeholder="example@example.com"
+                              {...field}
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -227,10 +238,7 @@ export default function AccountPage() {
                             </FormControl>
                             <SelectContent>
                               {prefectures.map((prefecture) => (
-                                <SelectItem
-                                  key={prefecture}
-                                  value={prefecture}
-                                >
+                                <SelectItem key={prefecture} value={prefecture}>
                                   {prefecture}
                                 </SelectItem>
                               ))}
@@ -421,11 +429,51 @@ export default function AccountPage() {
 
 // 都道府県リスト
 const prefectures = [
-  "北海道", "青森県", "岩手県", "宮城県", "秋田県", "山形県", "福島県",
-  "茨城県", "栃木県", "群馬県", "埼玉県", "千葉県", "東京都", "神奈川県",
-  "新潟県", "富山県", "石川県", "福井県", "山梨県", "長野県", "岐阜県",
-  "静岡県", "愛知県", "三重県", "滋賀県", "京都府", "大阪府", "兵庫県",
-  "奈良県", "和歌山県", "鳥取県", "島根県", "岡山県", "広島県", "山口県",
-  "徳島県", "香川県", "愛媛県", "高知県", "福岡県", "佐賀県", "長崎県",
-  "熊本県", "大分県", "宮崎県", "鹿児島県", "沖縄県"
+  "北海道",
+  "青森県",
+  "岩手県",
+  "宮城県",
+  "秋田県",
+  "山形県",
+  "福島県",
+  "茨城県",
+  "栃木県",
+  "群馬県",
+  "埼玉県",
+  "千葉県",
+  "東京都",
+  "神奈川県",
+  "新潟県",
+  "富山県",
+  "石川県",
+  "福井県",
+  "山梨県",
+  "長野県",
+  "岐阜県",
+  "静岡県",
+  "愛知県",
+  "三重県",
+  "滋賀県",
+  "京都府",
+  "大阪府",
+  "兵庫県",
+  "奈良県",
+  "和歌山県",
+  "鳥取県",
+  "島根県",
+  "岡山県",
+  "広島県",
+  "山口県",
+  "徳島県",
+  "香川県",
+  "愛媛県",
+  "高知県",
+  "福岡県",
+  "佐賀県",
+  "長崎県",
+  "熊本県",
+  "大分県",
+  "宮崎県",
+  "鹿児島県",
+  "沖縄県",
 ];
