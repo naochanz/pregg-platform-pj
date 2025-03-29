@@ -14,7 +14,7 @@ import {
   ChevronRight,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import {
   Tooltip,
   TooltipContent,
@@ -211,7 +211,7 @@ function MobileSidebar({
   return (
     <div className="flex flex-col h-full bg-white">
       <div className="flex items-center justify-center h-16 border-b border-gray-200">
-        <h1 className="text-2xl font-bold text-primary">PREGG</h1>
+        <SheetTitle className="text-2xl font-bold text-primary">PREGG</SheetTitle>
       </div>
       <nav className="flex-1 overflow-y-auto py-4">
         <ul className="space-y-1 px-2">
@@ -233,12 +233,17 @@ function MobileSidebar({
         </ul>
       </nav>
       <div className="p-4 border-t border-gray-200">
-        <Button variant="outline" className="w-full justify-start" asChild>
-          <Link href="/signin">
-            <LogOut className="h-5 w-5 mr-2" />
-            ログアウト
-          </Link>
-        </Button>
+      <Button
+                variant="outline"
+                className="w-full justify-start"
+                onClick={() => signOut()}
+              >
+                ログアウト
+                {/* <Link href="/signin">
+                  <LogOut className="h-5 w-5 mr-2" />
+                  ログアウト
+                </Link> */}
+              </Button>
       </div>
     </div>
   );
