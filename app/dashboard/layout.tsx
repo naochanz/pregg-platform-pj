@@ -158,7 +158,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
               <Button
                 variant="outline"
                 className="w-full justify-start"
-                onClick={() => signOut()}
+                onClick={() => signOut({callbackUrl: '/'})}
               >
                 ログアウト
                 {/* <Link href="/signin">
@@ -236,7 +236,7 @@ function MobileSidebar({
       <Button
                 variant="outline"
                 className="w-full justify-start"
-                onClick={() => signOut()}
+                onClick={() => signOut({callbackUrl: '/'})}
               >
                 ログアウト
                 {/* <Link href="/signin">

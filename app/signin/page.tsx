@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { signIn } from "next-auth/react";
+import { signIn, getSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -52,19 +52,55 @@ export default function SignInPage() {
           }
         };
 
-    const handleGoogleLogin = () => {
-        setIsLoading(true);
-        
-        try {
-            // 実際のアプリケーションではここでGoogle認証を呼び出します
-            // 例: signInWithGoogle() など
+        const handleGoogleLogin = async () => {
+            setIsLoading(true);
             
-            toast({
-                title: "Googleでログインしました",
-            });
-            
-            // ダッシュボードにリダイレクト
-            router.push("/dashboard");
+            try {
+              // Google認証を開始
+              const result = await signIn('google', {
+                redirect: false, // 自動リダイレクトを無効化
+              });
+              
+              if (result?.error) {
+                // 認証エラーが発生した場合
+                toast({
+                  variant: "destructive",
+                  title: "ログインに失敗しました",
+                  description: result.error
+                });
+                return;
+              }
+              
+              // セッション情報を取得して、ユーザーのメールアドレスを確認
+              const session = await getSession();
+              
+              if (!session || !session.user?.email) {
+                toast({
+                  variant: "destructive",
+                  title: "ユーザー情報の取得に失敗しました",
+                });
+                return;
+              }
+              
+              // メールアドレスをキーにユーザーの存在確認
+              const email = session.user.email;
+              const checkResponse = await fetch(`/api/auth/signup?email=${email}`);
+              const checkData = await checkResponse.json();
+              
+              if (checkResponse.status === 200 && checkData.exists) {
+                // ユーザーが既に存在する場合はダッシュボードにリダイレクト
+                toast({
+                  title: "ログインしました",
+                });
+                router.push("/dashboard");
+              } else {
+                // ユーザーが存在しない場合はサインアップページにリダイレクト
+                toast({
+                  title: "アカウント情報の登録が必要です",
+                  description: "必要な情報を入力してください"
+                });
+                router.push("/signup");
+              }
         } catch (error) {
             console.error("Googleログインエラー:", error);
             toast({

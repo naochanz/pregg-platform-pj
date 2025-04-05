@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useEffect } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import {
@@ -23,8 +23,31 @@ import {
   AlertDescription,
   AlertTitle,
 } from "@/components/ui/alert";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 export default function DashboardPage() {
+const {data: session, status } =useSession();
+const router = useRouter();
+
+  // セッションの状態をチェックし、未認証の場合はサインインページにリダイレクト
+useEffect(() => {
+  if (status === "unauthenticated"){
+    router.push("/signin");
+    return;
+  }
+}, [status, router])
+
+ // セッションローディング中は簡単なローディング表示
+ if (status === "loading") {
+  return <div className="flex justify-center items-center h-screen">ローディング中...</div>;
+}
+
+// 未認証状態ではレンダリングしない（リダイレクト前に画面が表示されるのを防ぐ）
+if (status === "unauthenticated") {
+  return null;
+}
+
   return (
     <div className="space-y-6">
       {/* プロフィール完了アラート */}
