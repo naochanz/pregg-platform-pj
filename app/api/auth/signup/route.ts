@@ -64,3 +64,33 @@ export async function POST(req: NextRequest) {
     );
   }
 }
+
+
+export const GET = async (req: NextRequest): Promise<NextResponse> => {
+  const requestData = req.nextUrl.searchParams;
+  const email = requestData.get("email") || undefined;
+  
+  try {
+    const user = await prisma.user.findUnique({
+      where: { email }
+    });
+    
+    if (!user) {
+      return NextResponse.json(
+        { success: false, message: "ユーザーが見つかりません" },
+        { status: 404 }
+      );
+    }
+    
+    return NextResponse.json(
+      { success: true, exists: true, user },
+      { status: 200 }
+    );
+  } catch (error) {
+    console.error("ユーザー検索エラー:", error);
+    return NextResponse.json(
+      { success: false, message: "サーバーエラーが発生しました" },
+      { status: 500 }
+    );
+  }
+};
