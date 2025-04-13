@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { signIn, getSession } from "next-auth/react";
+import { signIn, getSession, useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -14,6 +14,7 @@ import { Loader } from "lucide-react";
 
 export default function SignInPage() {
     const router = useRouter();
+    const { data: session } = useSession();
     const [isLoading, setIsLoading] = useState(false);
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -25,82 +26,82 @@ export default function SignInPage() {
 
         try {
             const result = await signIn("credentials", {
-              email,
-              password,
-              redirect: false,
+                email,
+                password,
+                redirect: false,
             });
-      
+
             if (result?.error) {
-              throw new Error(result.error);
+                throw new Error(result.error);
             }
-      
+
             toast({
-              title: "ログインしました",
+                title: "ログインしました",
             });
-            
+
             router.push("/dashboard");
             router.refresh();
-          } catch (error) {
+        } catch (error) {
             console.error("ログインエラー:", error);
             toast({
-              variant: "destructive",
-              title: "ログインに失敗しました",
-              description: "メールアドレスまたはパスワードが正しくありません",
+                variant: "destructive",
+                title: "ログインに失敗しました",
+                description: "メールアドレスまたはパスワードが正しくありません",
             });
-          } finally {
+        } finally {
             setIsLoading(false);
-          }
-        };
+        }
+    };
 
-        const handleGoogleLogin = async () => {
-            setIsLoading(true);
-            
-            try {
-              // Google認証を開始
-              const result = await signIn('google', {
+    const handleGoogleLogin = async () => {
+        setIsLoading(true);
+
+        try {
+            // Google認証を開始
+            const result = await signIn('google', {
                 redirect: false, // 自動リダイレクトを無効化
-              });
-              
-              if (result?.error) {
+            });
+
+            if (result?.error) {
                 // 認証エラーが発生した場合
                 toast({
-                  variant: "destructive",
-                  title: "ログインに失敗しました",
-                  description: result.error
+                    variant: "destructive",
+                    title: "ログインに失敗しました",
+                    description: result.error
                 });
                 return;
-              }
-              
-              // セッション情報を取得して、ユーザーのメールアドレスを確認
-              const session = await getSession();
-              
-              if (!session || !session.user?.email) {
+            }
+
+            // セッション情報を取得して、ユーザーのメールアドレスを確認
+            const session = await getSession();
+
+            if (!session || !session.user?.email) {
                 toast({
-                  variant: "destructive",
-                  title: "ユーザー情報の取得に失敗しました",
+                    variant: "destructive",
+                    title: "ユーザー情報の取得に失敗しました",
                 });
                 return;
-              }
-              
-              // メールアドレスをキーにユーザーの存在確認
-              const email = session.user.email;
-              const checkResponse = await fetch(`/api/auth/signup?email=${email}`);
-              const checkData = await checkResponse.json();
-              
-              if (checkResponse.status === 200 && checkData.exists) {
+            }
+
+            // メールアドレスをキーにユーザーの存在確認
+            const email = session.user.email;
+            const checkResponse = await fetch(`/api/auth/signup?email=${email}`);
+            const checkData = await checkResponse.json();
+
+            if (checkResponse.status === 200 && checkData.exists) {
                 // ユーザーが既に存在する場合はダッシュボードにリダイレクト
                 toast({
-                  title: "ログインしました",
+                    title: "ログインしました",
                 });
                 router.push("/dashboard");
-              } else {
+            } else {
                 // ユーザーが存在しない場合はサインアップページにリダイレクト
                 toast({
-                  title: "アカウント情報の登録が必要です",
-                  description: "必要な情報を入力してください"
+                    title: "アカウント情報の登録が必要です",
+                    description: "必要な情報を入力してください"
                 });
                 router.push("/signup");
-              }
+            }
         } catch (error) {
             console.error("Googleログインエラー:", error);
             toast({
@@ -110,6 +111,11 @@ export default function SignInPage() {
         } finally {
             setIsLoading(false);
         }
+    };
+
+    // ダッシュボードへのログイン処理
+    const handleLoginToDashboard = () => {
+        router.push('/dashboard');
     };
 
     return (
@@ -122,10 +128,10 @@ export default function SignInPage() {
                     </p>
                 </div>
 
-                <Tabs defaultValue="email" className="w-full">
+                <Tabs defaultValue="google" className="w-full">
                     <TabsList className="grid w-full grid-cols-2">
-                        <TabsTrigger value="email">メールアドレス</TabsTrigger>
                         <TabsTrigger value="google">Google</TabsTrigger>
+                        <TabsTrigger value="email">メールアドレス</TabsTrigger>
                     </TabsList>
 
                     <TabsContent value="email">
@@ -140,11 +146,11 @@ export default function SignInPage() {
                                 <CardContent className="space-y-4">
                                     <div className="space-y-2">
                                         <Label htmlFor="email">メールアドレス</Label>
-                                        <Input 
-                                            id="email" 
-                                            type="email" 
-                                            placeholder="example@example.com" 
-                                            required 
+                                        <Input
+                                            id="email"
+                                            type="email"
+                                            placeholder="example@example.com"
+                                            required
                                             value={email}
                                             onChange={(e) => setEmail(e.target.value)}
                                         />
@@ -156,17 +162,17 @@ export default function SignInPage() {
                                                 パスワードをお忘れですか？
                                             </Link>
                                         </div>
-                                        <Input 
-                                            id="password" 
-                                            type="password" 
-                                            required 
+                                        <Input
+                                            id="password"
+                                            type="password"
+                                            required
                                             value={password}
                                             onChange={(e) => setPassword(e.target.value)}
                                         />
                                     </div>
                                     <div className="flex items-center space-x-2">
-                                        <Checkbox 
-                                            id="remember" 
+                                        <Checkbox
+                                            id="remember"
                                             checked={rememberMe}
                                             onCheckedChange={(checked) => setRememberMe(checked === true)}
                                         />
@@ -174,9 +180,9 @@ export default function SignInPage() {
                                     </div>
                                 </CardContent>
                                 <CardFooter>
-                                    <Button 
-                                        type="submit" 
-                                        className="w-full" 
+                                    <Button
+                                        type="submit"
+                                        className="w-full"
                                         disabled={isLoading}
                                     >
                                         {isLoading ? (
@@ -201,15 +207,30 @@ export default function SignInPage() {
                                     Googleアカウントを使って簡単にログインできます
                                 </CardDescription>
                             </CardHeader>
+                            {session && (
+                                <div className="flex items-center flex-row space-x-2 p-4">
+                                    <img
+                                        alt="avatar"
+                                        src={session.user.image as string}
+                                        width={40}
+                                        height={40}
+                                        className="rounded-full"
+                                    />
+                                    <div className="flex flex-col">
+                                        <p className="font-semibold">{session.user.name}</p>
+                                        <p className="text-sm text-gray-500">{session.user.email}</p>
+                                    </div>
+                                </div>
+                            )}
                             <CardContent className="space-y-4">
-                                <Button 
-                                    variant="outline" 
+                                <Button
+                                    variant="outline"
                                     className="w-full"
                                     onClick={handleGoogleLogin}
                                     disabled={isLoading}
                                 >
                                     {isLoading ? (
-                                        <div className="flex items-center flex-row">
+                                        <div className="flex items-center flex-row border">
                                             <Loader className="h-4 w-4 animate-spin mr-2" />
                                             ログイン中...
                                         </div>
@@ -244,6 +265,15 @@ export default function SignInPage() {
                                         </>
                                     )}
                                 </Button>
+                                {session ? (
+                                    <Button 
+                                        className="w-full"
+                                        onClick={handleLoginToDashboard}
+                                        disabled={isLoading}
+                                    >
+                                        ログイン
+                                    </Button>
+                                ) : null}
                             </CardContent>
                         </Card>
                     </TabsContent>

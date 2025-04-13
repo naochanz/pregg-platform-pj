@@ -83,7 +83,7 @@ export default function SignupPage() {
       if (checkResponse.status === 200 && checkData.exists) {
         // ユーザーが既に存在する場合は直接ダッシュボードにリダイレクト
         toast({
-          title: "既存のでログインしました",
+          title: "既存のユーザーでログインしました",
         });
         router.push("/dashboard");
         return;
@@ -156,8 +156,8 @@ export default function SignupPage() {
 
         <Tabs defaultValue="google" className="w-full">
           <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="email">メールアドレス</TabsTrigger>
             <TabsTrigger value="google">Google</TabsTrigger>
+            <TabsTrigger value="email">メールアドレス</TabsTrigger>
           </TabsList>
 
           <TabsContent value="email">

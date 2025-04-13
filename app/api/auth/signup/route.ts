@@ -1,3 +1,4 @@
+// app/api/auth/signup/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prismaClient";
 import * as bcrypt from "bcrypt";
@@ -65,25 +66,26 @@ export async function POST(req: NextRequest) {
   }
 }
 
-
 export const GET = async (req: NextRequest): Promise<NextResponse> => {
   const requestData = req.nextUrl.searchParams;
-  const email = requestData.get("email") || undefined;
+  const email = requestData.get("email");
+  
+  // メールアドレスが空の場合は早期にエラーレスポンスを返す
+  if (!email || email.trim() === '') {
+    return NextResponse.json(
+      { success: false, message: "メールアドレスが指定されていません" },
+      { status: 400 }
+    );
+  }
   
   try {
     const user = await prisma.user.findUnique({
       where: { email }
     });
     
-    if (!user) {
-      return NextResponse.json(
-        { success: false, message: "ユーザーが見つかりません" },
-        { status: 404 }
-      );
-    }
-    
+    // ユーザーが存在するかどうかを示すシンプルなレスポンス
     return NextResponse.json(
-      { success: true, exists: true, user },
+      { exists: !!user },
       { status: 200 }
     );
   } catch (error) {
